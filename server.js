@@ -22,20 +22,6 @@ app.get('/contato', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'contato.html'));
 });
 
-app.post('/contato', (req, res) => {
-  const { nome, email, assunto, mensagem } = req.body;
-
-  if (!nome || !email || !assunto || !mensagem) {
-    return res.status(400).json({ erro: 'Todos os campos são obrigatórios.' });
-  }
-
-  res.status(200).json({
-    mensagem: 'Contato recebido com sucesso!',
-    dados: { nome, email, assunto, mensagem }
-  });
-});
-
-
 app.get('/sugestao', (req, res) => {
   const nome = req.query.nome;
   const ingredientes = req.query.ingredientes;
@@ -63,6 +49,23 @@ app.get('/sugestao', (req, res) => {
 app.post('/contato', (req, res) => {
   const { nome, email, assunto, mensagem } = req.body;
 
+  if (!nome || !email || !assunto || !mensagem) {
+    return res.status(400).contentType("text/html").send(`
+      <!DOCTYPE html>
+      <html lang="pt-BR">
+      <head>
+        <meta charset="UTF-8">
+        <title>Erro no envio</title>
+      </head>
+      <body>
+        <h1>Erro</h1>
+        <p>Todos os campos são obrigatórios.</p>
+        <a href="/contato">Voltar</a>
+      </body>
+      </html>
+    `);
+  }
+
   const respostaHTML = `
     <!DOCTYPE html>
     <html lang="pt-BR">
@@ -78,13 +81,17 @@ app.post('/contato', (req, res) => {
       <p><strong>Assunto:</strong> ${assunto}</p>
       <p><strong>Mensagem:</strong></p>
       <blockquote>${mensagem}</blockquote>
+
       <a href="/">Voltar à página inicial</a>
+      
     </body>
     </html>
   `;
 
-  res.send(respostaHTML);
+  res.status(200).contentType("text/html").send(respostaHTML);
 });
+
+
 
 const fs = require('fs');
 
